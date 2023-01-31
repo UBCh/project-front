@@ -5,7 +5,7 @@
     <link href="/css/my.css" rel="stylesheet">
 </head>
 <body onload="showContent(0)">
-<!--<body>-->
+
 <h1>RPG admin panel</h1>
 
 
@@ -30,32 +30,7 @@
         <th>Edit</th>
         <th>Delete</th>
     </tr>
-    <!--    <tr>-->
-    <!--        <td>Emil</td>-->
-    <!--        <td>Tobias</td>-->
-    <!--        <td>Linus</td>-->
-    <!--        <td>Emil</td>-->
-    <!--        <td>Tobias</td>-->
-    <!--        <td>Linus</td>-->
-    <!--        <td>Emil</td>-->
-    <!--        <td>Tobias</td>-->
-    <!--    <td>Edit</td>-->
-    <!--    <td>Delete</td>-->
-    <!--         </tr>-->
-    <!--    <tr>-->
-    <!--        <td>Emil</td>-->
-    <!--        <td>Tobias</td>-->
-    <!--        <td>Linus</td>-->
-    <!--        <td>Emil</td>-->
-    <!--        <td>Tobias</td>-->
-    <!--        <td>Linus</td>-->
-    <!--        <td>Emil</td>-->
-    <!--        <td>Tobias</td>-->
-    <!--    <td>Edit</td>-->
-    <!--    <td>Delete</td>-->
-    <!--    </tr>-->
-
-</table>
+  </table>
 
 <div id="padding-buttons">
 </div>
@@ -111,22 +86,26 @@
 
 <script>
     function showContent(page_number) {
-
-        let url = "/rest/players?";
-         fillingTable()
-        $("tr:has(td)").remove();
-        let totalCount = getTotalCount();
-        let countPage = $("#countOne").val();
-        if (totalCount === 0) {
-            countPage = 3
-        }
-        url = url.concat("pageSize").concat(countPage);
         if (page_number == null) {
             page_number = 0
         }
+        let url = "/rest/players?";
+
+        $("tr:has(td)").remove();
+        let totalCount = getTotalCount();
+
+        if (totalCount === 0) {
+            countPage = 3
+        }
+        let countPage = $("#countOne").val();
+
+        url = url.concat("&pageSize").concat(countPage);
+
         url = url.concat("&pageNumber").concat(page_number);
 
         countPage = Math.ceil(totalCount / countPage);
+
+        fillingTable(url)
 
         $("button.paging-button-style").remove();
 
@@ -143,21 +122,29 @@
 
     }
 
-    function fillingTable() {
-        fetch('/rest/players')
+    function fillingTable(url) {
+
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 let content = data
-                console.log(content)
+                let countPage = $("#countOne").val();
+                            console.log(countPage+ "welcom")
                 let arraySize = content.push();
-                console.log(arraySize)
-                for (let i = 0; i < arraySize; i++) {
-                    createTr(content[i])
-                }
-                ;
-            });
+
+                if (countPage<=0){countPage=1}
+               let count=0;
+                        for (let i = 0; i < arraySize; i++) {
+                            if (count<countPage){
+                                createTr(content[i])
+                               if (i===(arraySize-1)){i=0;}
+                            }
+                        count=count+1;
+                    }
+                });
 
         function createTr(item) {
+            console.log(item.id+ "fillingTable")
             $("table").append("<tr><br><td>" + item.id + "</td><td>"
                 + item.name + "</td><td>"
                 + item.title + "</td><td>"
@@ -183,8 +170,8 @@
             url: url,
             async: false,
             success: function (res) {
-                result = parseInt(res)
-            }
+                result = parseInt(res);
+                           }
         });
         return result;
     }
@@ -202,8 +189,9 @@
     }
 
     function editAccount(id) {
-        let identEdit = "button_edit" + id;
-        let identDelete = "button_delete" + id;
+            let identEdit = "button_edit" + id;
+            let identDelete = "button_delete" + id;
+
         $(identDelete).remove();
         let saveImagTag = "<img src='/img/save.png' alt='SAVE'>";
         $(identEdit).html(saveImagTag);
@@ -211,10 +199,10 @@
         let childrenCurrent = currentTrElement.children();
 
         let tdName = childrenCurrent[1];
-        tdName.innerHTML = "<input id='input_name_" + id + " 'type ='text' value='" + tdName.innerHTML + "'>"
+        tdName.innerHTML = "<input id='input_name_'" + id + " 'type ='text' value='tdName.innerHTML'>"
 
         let tdTitle = childrenCurrent[2];
-        tdTitle.innerHTML = "<input id='input_title_" + id + " 'type ='text' value='" + tdTitle.innerHTML + "'>"
+        tdTitle.innerHTML = "<input id='input_title_'" + id + " 'type ='text' value='" + tdTitle.innerHTML + "'>"
 
         let tdRace = childrenCurrent[3];
         let raceId = "#select_race_" + id;
