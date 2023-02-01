@@ -129,8 +129,7 @@
             .then(data => {
                 let content = data
                 let countPage = $("#countOne").val();
-                            console.log(countPage+ "welcom")
-                let arraySize = content.push();
+                             let arraySize = content.push();
 
                 if (countPage<=0){countPage=1}
                let count=0;
@@ -144,7 +143,8 @@
                 });
 
         function createTr(item) {
-            console.log(item.id+ "fillingTable")
+           let butIdEdit="button_edit" + item.id
+            let butIdDelete="button_delete" + item.id
             $("table").append("<tr><br><td>" + item.id + "</td><td>"
                 + item.name + "</td><td>"
                 + item.title + "</td><td>"
@@ -153,10 +153,10 @@
                 + item.level + "</td><td>"
                 + new Date(item.birthday).toLocaleDateString() + "</td><td>"
                 + item.banned + "</td><td><button>"
-                + "<button id='button_edit'" + item.id + " onclick='editAccount(" + item.id + ")'>"
+                + "<button id='"+butIdEdit+"' onclick='editAccount(" + item.id + ")'>"
                 + "<img src='/img/edit.png' alt='EDIT' >"
                 + "</button>"
-                + "</td><td><button id='button_delete'" + item.id + " onclick='deleteAccount(" + item.id + ")'>"
+                + "</td><td><button id='"+butIdDelete +"' onclick='deleteAccount(" + item.id + ")'>"
                 +"<img src='/img/delete.png' alt='DELETE'>"
                 + "</button>" + "</td>"
             );
@@ -189,37 +189,45 @@
     }
 
     function editAccount(id) {
-            let identEdit = "button_edit" + id;
-            let identDelete = "button_delete" + id;
-
-        $(identDelete).remove();
+            let identEdit = "#button_edit" + id;
+            let identDelete = "#button_delete" + id;
+            $(identDelete).remove();
         let saveImagTag = "<img src='/img/save.png' alt='SAVE'>";
         $(identEdit).html(saveImagTag);
         let currentTrElement = $(identEdit).parent().parent();
         let childrenCurrent = currentTrElement.children();
 
-        let tdName = childrenCurrent[1];
-        tdName.innerHTML = "<input id='input_name_'" + id + " 'type ='text' value='tdName.innerHTML'>"
+        let tdName = document.getSelection();
+        let value=$(tdName).val()
+        $(tdName).append("<input id='input_name_'" + id + " type ='text' value='"+value+"'>")
 
         let tdTitle = childrenCurrent[2];
-        tdTitle.innerHTML = "<input id='input_title_'" + id + " 'type ='text' value='" + tdTitle.innerHTML + "'>"
+        // tdTitle.innerHTML = "<input id='input_title_'" + id + " 'type ='text' value='" + tdTitle.innerHTML + "'>"
+$(tdTitle).append("<input id='input_title_'" + id + " type ='text' value='______'>")
+
 
         let tdRace = childrenCurrent[3];
         let raceId = "#select_race_" + id;
-        let currentRace = tdRace.innerHTML
-        tdRace.innerHTML = getOptionsForRace(id)
+        // let currentRace = tdRace.innerHTML
+        let currentRace =$(tdRace).innerHTML
+        // tdRace.innerHTML = getOptionsForRace(id)
+     $(tdRace).append(getOptionsForRace(id))
         $(raceId).val(currentRace).change();
 
         let tdProf = childrenCurrent[4];
         let profesId = "#select_profession_" + id;
-        let currentProfes = tdProf.innerHTML
-        tdProf.innerHTML = getOptionsForProfession(id)
+        // let currentProfes = tdProf.innerHTML
+        let currentProfes =$(tdProf).innerHTML
+        // tdProf.innerHTML = getOptionsForProfession(id)
+        $(tdProf).append(getOptionsForProfession(id))
         $(profesId).val(currentProfes).change();
 
         let tdBanned = childrenCurrent[7];
         let bannedId = "#select_banned_" + id;
-        let currentBanned = tdBanned.innerHTML
-        tdBanned.innerHTML = getOptionsForBanned(id)
+        // let currentBanned = tdBanned.innerHTML
+        let currentBanned =$(tdBanned).innerHTML
+        // tdBanned.innerHTML = getOptionsForBanned(id)
+        $(tdBanned).append(getOptionsForBanned(id))
         $(bannedId).val(currentBanned).change();
 
         let property_save_tag = "saveAcc(" + id + ")";
