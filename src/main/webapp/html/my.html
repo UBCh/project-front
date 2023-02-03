@@ -9,12 +9,12 @@
 <h1>RPG admin panel</h1>
 
 
-<label for="countOne"> show aunts per page</label>
+<label for="countOne"> show aunts per page:</label>
 <select id="countOne" onchange="showContent(0)">
     <option value="3">3</option>
     <option value="5">5</option>
     <option value="10">10</option>
-    <option value="30">30</option>
+    <option value="30">20</option>
 
 </select>
 <table id="tableId" style="width:100%">
@@ -32,8 +32,7 @@
     </tr>
   </table>
 
-<div id="padding-buttons">
-</div>
+<div id="padding-buttons">Pages:</div>
 
 <hr>
 
@@ -86,30 +85,18 @@
 
 <script>
     function showContent(page_number) {
-        if (page_number == null) {
-            page_number = 0
-        }
-        let url = "/rest/players?";
 
+        let url = "/rest/players?";
         $("tr:has(td)").remove();
         let totalCount = getTotalCount();
+        let countAccPage = $("#countOne").val();
+        url = url.concat("&pageSize=").concat(countAccPage);
+        url = url.concat("&pageNumber=").concat(page_number);
+        let countBountPage = Math.ceil(totalCount / countAccPage);
 
-        if (totalCount === 0) {
-            countPage = 3
-        }
-        let countPage = $("#countOne").val();
-
-        url = url.concat("&pageSize").concat(countPage);
-
-        url = url.concat("&pageNumber").concat(page_number);
-
-        countPage = Math.ceil(totalCount / countPage);
-
-        fillingTable(url)
-
+        fillingTable(url);
         $("button.paging-button-style").remove();
-
-        for (let i = 0; i < countPage; i++) {
+        for (let i = 0; i < countBountPage; i++) {
             let buttonTg = "<button>" + (i + 1) + "</button>"
             let button = $(buttonTg)
                 .attr("id", "paging_button" + i)
@@ -122,46 +109,39 @@
 
     }
 
+
     function fillingTable(url) {
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                let content = data
-                let countPage = $("#countOne").val();
-                             let arraySize = content.push();
-
-                if (countPage<=0){countPage=1}
-               let count=0;
-                        for (let i = 0; i < arraySize; i++) {
-                            if (count<countPage){
-                                createTr(content[i])
-                               if (i===(arraySize-1)){i=0;}
-                            }
-                        count=count+1;
-                    }
-                });
-
-        function createTr(item) {
-           let butIdEdit="button_edit" + item.id
-            let butIdDelete="button_delete" + item.id
-            $("table").append("<tr><br><td>" + item.id + "</td><td>"
-                + item.name + "</td><td>"
-                + item.title + "</td><td>"
-                + item.race + "</td><td>"
-                + item.profession + "</td><td>"
-                + item.level + "</td><td>"
-                + new Date(item.birthday).toLocaleDateString() + "</td><td>"
-                + item.banned + "</td><td><button>"
-                + "<button id='"+butIdEdit+"' onclick='editAccount(" + item.id + ")'>"
-                + "<img src='/img/edit.png' alt='EDIT' >"
-                + "</button>"
-                + "</td><td><button id='"+butIdDelete +"' onclick='deleteAccount(" + item.id + ")'>"
-                +"<img src='/img/delete.png' alt='DELETE'>"
-                + "</button>" + "</td>"
-            );
-        };
+                $.each(data, function (i, item) {
+                    createTr(item);
+                })
+            })
     }
+
+
+    function createTr(item) {
+        let butIdEdit = "button_edit" + item.id
+        let butIdDelete = "button_delete" + item.id
+        $("table").append("<tr><br><td>" + item.id + "</td><td>"
+            + item.name + "</td><td>"
+            + item.title + "</td><td>"
+            + item.race + "</td><td>"
+            + item.profession + "</td><td>"
+            + item.level + "</td><td>"
+            + new Date(item.birthday).toLocaleDateString() + "</td><td>"
+            + item.banned + "</td><td>"
+            + "<button id='" + butIdEdit + "' onclick='editAccount(" + item.id + ")'>"
+            + "<img src='/img/edit.png' alt='EDIT' >"
+            + "</button>"
+            + "</td><td><button id='" + butIdDelete + "' onclick='deleteAccount(" + item.id + ")'>"
+            + "<img src='/img/delete.png' alt='DELETE'>"
+            + "</button>" + "</td>"
+        );
+    }
+
 
     function getTotalCount() {
         let url = "/rest/players/count"
@@ -182,6 +162,7 @@
             url: url,
             type: "DELETE",
             success: function () {
+                console.log(url);
                 showContent(getCurrentNumber())
             }
 
@@ -189,9 +170,9 @@
     }
 
     function editAccount(id) {
-            let identEdit = "#button_edit" + id;
+        let identEdit = "#button_edit" + id;
         let identDelete = "#button_delete" + id;
-        $(identDelete).remove();
+        $(identDelete).hide();
         let saveImagTag = "<img src='/img/save.png' alt='SAVE'>";
         $(identEdit).html(saveImagTag);
 
@@ -215,19 +196,18 @@
         let raceId = "#select_race_" + id;
         let currentRace = $(tdRace).innerHTML
         $(tdRace).html(getOptionsForRace(id))
-        // $(raceId).val(currentRace).change();
 
         let tdProf = childrenCurrent[4];
         let profesId = "#select_profession_" + id;
         let currentProfes =$(tdProf).innerHTML
         $(tdProf).html(getOptionsForProfession(id))
-        // $(profesId).val(currentProfes).change();
+
 
         let tdBanned = childrenCurrent[7];
         let bannedId = "#select_banned_" + id;
         let currentBanned =$(tdBanned).innerHTML
         $(tdBanned).html(getOptionsForBanned(id))
-        // $(bannedId).val(currentBanned).change();
+
 
         let property_save_tag = "saveAcc(" + id + ")";
         $(identEdit).attr('onclick', property_save_tag);
@@ -238,15 +218,18 @@
         let value_Title = $("#input_title_new").val();
         let value_Race = $("#input_race_new").val();
         let value_profession = $("#input_profession_new").val();
-        let value_banned = $("#input_banned_new").val();
         let value_level = $("#input_level_new").val();
         let value_birthday = $("#input_birthday_new").val();
+        let value_banned = $("#input_banned_new").val();
+        console.log(value_banned)
+        if (value_banned == "FALSE") {
+            value_banned = false;
+        }
+        value_banned = true;
 
-        let url_current_pag = window.location.href;
-        console.log(url_current_pag)
         let url_create = "/rest/players";
 
-        $.ajax({
+        $.post({
             url: url_create,
             type: 'POST',
             dataType: 'json',
@@ -258,9 +241,9 @@
                 "title": value_Title,
                 "race": value_Race,
                 "profession": value_profession,
+                "birthday": new Date(value_birthday).getTime(),
                 "banned": value_banned,
-                "level": value_level,
-                "birthday": new Date(value_birthday).getTime()
+                "level": value_level
             }),
             success: function () {
                 $("#input_name_new").val("");
@@ -270,25 +253,39 @@
                 $("#input_banned_new").val("");
                 $("#input_level_new").val("");
                 $("#input_birthday_new").val("");
-                showContent(getCurrentNumber(""))
+                console.log(JSON.stringify({
+                    "name": value_Name,
+                    "title": value_Title,
+                    "race": value_Race,
+                    "profession": value_profession,
+                    "birthday": new Date(value_birthday).getTime(),
+                    "banned": value_banned,
+                    "level": value_level
+                }))
+                showContent(getCurrentNumber())
             }
         });
     }
 
 
     function saveAcc(id) {
+
         let value_Name = "#input_name_" + id;
         let value_Title = "#input_title_" + id;
         let value_Race = "#select_race_" + id;
         let value_profession = "#select_profession_" + id;
-        let value_banned = "#select_banned_" + id;
+        let value_bannedTxt = "#select_banned_" + id;
 
         value_Name = $(value_Name).val();
         value_Title = $(value_Title).val();
         value_Race = $(value_Race).val();
         value_profession = $(value_profession).val();
-        value_banned = $(value_banned).val();
+        value_bannedTxt = $(value_bannedTxt).val();
 
+        let value_banned = true;
+        if (value_bannedTxt == "FALSE") {
+            value_banned = false;
+        }
         let url = "/rest/players/" + id;
         let content = JSON.stringify({
             "name": value_Name,
@@ -297,25 +294,43 @@
             "profession": value_profession,
             "banned": value_banned
         })
-        console.log(content)
-        $.post(url, content);
 
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
 
-        //     $.ajax({
-        //     type: 'POST',
-        //     dataType: 'json',
-        //     contentType: 'application/json;charset=UTF-8',
-        //     async: false,
-        //     processData: false,
-        //     data: JSON.stringify({"name": value_Name,
-        //         "title": value_Title,
-        //         "race": value_Race,
-        //         "profession": value_profession,
-        //         "banned": value_banned}),
-        //     success: function () {
-        //         showContent(getCurrentNumber())
-        //     }
-        // });
+        let raw = JSON.stringify({
+            "name": value_Name,
+            "title": value_Title,
+            "race": value_Race,
+            "profession": value_profession,
+            "banned": value_banned
+        });
+
+        let requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch("http://localhost:8080/rest/players/" + id, requestOptions)
+            .then(response => response.text())
+            .then(result => console.log(result))
+            .catch(error => console.log('error', error));
+
+        showContent(getCurrentNumber());
+        buttonRecovery(id)
+    }
+
+    function buttonRecovery(id) {
+        showContent(getCurrentNumber());
+        let identEdit = "#button_edit" + id;
+        let identNew = "button_edit" + id;
+        let identDelete = "#button_delete" + id;
+        $(identDelete).show();
+        let valueAttribute = "<button id=" + identNew + " onclick='editAccount(" + id + ")'>" + "<img src='/img/edit.png' alt='EDIT' >";
+        $(identEdit).replaceWith(valueAttribute);
+
     }
 
 
@@ -352,8 +367,8 @@
         let bannedId = "select_banned_" + id;
         return "<label for='banned'></label>"
             + "<select id=" + bannedId + " name='banned'>"
-            + "<option value='FALSE'>FALSE</option>"
-            + "<option value='TRUE'>TRUE</option>"
+            + "<option value='FALSE'>false</option>"
+            + "<option value='TRUE'>true</option>"
             + "</select>"
     }
 

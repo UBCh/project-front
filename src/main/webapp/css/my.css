@@ -1,4 +1,20 @@
 th,td{
     border: 1px solid black;
     padding: 3px;
+
+}
+td,tr{
+    text-align: center;
+}
+tr:hover {background-color: coral;}
+th {
+    background-color: #04AA6D;
+    color: white;
+}
+#input_name_new {
+    border: 5px solid red;
+    padding:  0em 1em;
+    border-radius: 16px;
+    font-size: 24px;
+    line-height: 2;
 }
