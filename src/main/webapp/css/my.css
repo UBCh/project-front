@@ -1,0 +1,38 @@
+body {
+    font-family: "Brush Script MT", cursive;
+}
+th,td{
+    border: 5px solid #12105d;
+    padding: 5px;
+    }
+
+table {
+    color: #12105d;
+    font-size: 15px;
+}
+td,tr{
+    text-align: center;
+    font-size: 15px;
+}
+tr:hover td {
+    color: #c40902;}
+th {
+    background-color: #12105d;
+    color: white;
+}
+#input_name_new,#input_title_new, #input_race_new,#input_profession_new,#input_level_new,#input_birthday_new,#input_banned_new{
+    border: 2px solid red;
+    padding:  0em 1em;
+    border-radius: 10px;
+    font-size: 15px;
+    line-height: 2;
+}
+h2,label{
+   color: #6e0317;
+}
+h2{
+   font-size: 25px;
+}
+label{
+    font-size: 20px;
+}
